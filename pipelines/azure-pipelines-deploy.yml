@@ -1,0 +1,78 @@
+# =============================================================================
+# SX400 — Deploy Pipeline
+# Triggered after the build pipeline completes on main.
+# Downloads build artifacts and deploys FE + BE in parallel to Azure App Services.
+# =============================================================================
+
+trigger: none   # Only triggered by pipeline resource
+
+resources:
+  pipelines:
+    - pipeline: buildPipeline
+      source: 'sx400-build'          # ← Name of your build pipeline in Azure DevOps
+      trigger:
+        branches:
+          include:
+            - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+# ─────────────────────────────────────────────────────
+# Variables — configure these in the Azure DevOps UI
+# or in a variable group for secrets
+# ─────────────────────────────────────────────────────
+variables:
+  azureSubscription: '<YOUR_SERVICE_CONNECTION>'      # Azure service connection name
+  backendAppName: '<YOUR_BACKEND_APP_SERVICE_NAME>'   # e.g., sx400-api
+  frontendAppName: '<YOUR_FRONTEND_APP_SERVICE_NAME>' # e.g., sx400-frontend
+
+stages:
+  - stage: Deploy
+    displayName: '🚀 Deploy to Azure App Services'
+    jobs:
+      # ─────────────────────────────────────────────
+      # Job 1: Deploy Backend API
+      # ─────────────────────────────────────────────
+      - deployment: DeployBackend
+        displayName: 'Deploy Backend API'
+        environment: 'production-backend'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: buildPipeline
+                  artifact: 'backend-drop'
+                  displayName: 'Download backend artifact'
+
+                - task: AzureWebApp@1
+                  displayName: 'Deploy to Backend App Service'
+                  inputs:
+                    azureSubscription: $(azureSubscription)
+                    appType: 'webAppLinux'
+                    appName: $(backendAppName)
+                    package: '$(Pipeline.Workspace)/buildPipeline/backend-drop'
+                    runtimeStack: 'DOTNETCORE|8.0'
+
+      # ─────────────────────────────────────────────
+      # Job 2: Deploy Frontend (parallel — no dependsOn)
+      # ─────────────────────────────────────────────
+      - deployment: DeployFrontend
+        displayName: 'Deploy Frontend'
+        environment: 'production-frontend'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: buildPipeline
+                  artifact: 'frontend-drop'
+                  displayName: 'Download frontend artifact'
+
+                - task: AzureWebApp@1
+                  displayName: 'Deploy to Frontend App Service'
+                  inputs:
+                    azureSubscription: $(azureSubscription)
+                    appType: 'webAppLinux'
+                    appName: $(frontendAppName)
+                    package: '$(Pipeline.Workspace)/buildPipeline/frontend-drop'
+                    runtimeStack: 'NODE|20-lts'

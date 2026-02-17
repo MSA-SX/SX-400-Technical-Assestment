@@ -1,0 +1,80 @@
+# =============================================================================
+# SX400 — Build Pipeline
+# Triggers on main branch. Builds both FE and BE in parallel, publishes
+# pipeline artifacts (drops) for the deploy pipeline to consume.
+# =============================================================================
+
+trigger:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+stages:
+  # ─────────────────────────────────────────────────────
+  # Stage 1: Build Backend (.NET 8)
+  # ─────────────────────────────────────────────────────
+  - stage: BuildBackend
+    displayName: '🔧 Build Backend'
+    jobs:
+      - job: BuildDotNet
+        displayName: 'Build & Test .NET API'
+        steps:
+          - task: UseDotNet@2
+            displayName: 'Install .NET 8 SDK'
+            inputs:
+              packageType: 'sdk'
+              version: '8.x'
+
+          - script: dotnet restore
+            displayName: 'Restore NuGet packages'
+            workingDirectory: 'backend'
+
+          - script: dotnet build --configuration Release --no-restore
+            displayName: 'Build solution'
+            workingDirectory: 'backend'
+
+          - script: dotnet publish backend/SX400.Api/SX400.Api.csproj --configuration Release --output $(Build.ArtifactStagingDirectory)/backend --no-build
+            displayName: 'Publish API'
+            workingDirectory: '$(System.DefaultWorkingDirectory)'
+
+          - task: PublishPipelineArtifact@1
+            displayName: 'Publish backend artifact'
+            inputs:
+              targetPath: '$(Build.ArtifactStagingDirectory)/backend'
+              artifact: 'backend-drop'
+              publishLocation: 'pipeline'
+
+  # ─────────────────────────────────────────────────────
+  # Stage 2: Build Frontend (React + Vite)
+  # ─────────────────────────────────────────────────────
+  - stage: BuildFrontend
+    displayName: '🎨 Build Frontend'
+    dependsOn: []       # ← Run in parallel with backend
+    jobs:
+      - job: BuildReact
+        displayName: 'Build React App'
+        steps:
+          - task: NodeTool@0
+            displayName: 'Install Node.js 20'
+            inputs:
+              versionSpec: '20.x'
+
+          - script: npm ci
+            displayName: 'Install npm dependencies'
+            workingDirectory: 'frontend'
+
+          - script: npm run build
+            displayName: 'Build production bundle'
+            workingDirectory: 'frontend'
+            env:
+              VITE_API_URL: $(VITE_API_URL)   # Set in pipeline variables
+
+          - task: PublishPipelineArtifact@1
+            displayName: 'Publish frontend artifact'
+            inputs:
+              targetPath: 'frontend/dist'
+              artifact: 'frontend-drop'
+              publishLocation: 'pipeline'
