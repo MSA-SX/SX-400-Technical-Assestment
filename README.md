@@ -1,7 +1,7 @@
 # SX400 — Full-Stack Application
 
 > **Stack:** React 18 + Vite (Frontend) · ASP.NET Core 8 (Backend API) · Azure SQL Server (Database)
-> **CI/CD:** Azure DevOps Pipelines → Azure App Services
+> **CI/CD:** Azure DevOps Pipelines → Azure App Service
 
 ## 📁 Project Structure
 
