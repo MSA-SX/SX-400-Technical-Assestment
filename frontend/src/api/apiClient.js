@@ -2,11 +2,14 @@ import axios from 'axios';
 
 const apiClient = axios.create({
     baseURL: import.meta.env.VITE_API_URL || '/api',
+
     headers: {
         'Content-Type': 'application/json',
     },
     timeout: 10000,
 });
+
+console.log('API Client Base URL:', import.meta.env.VITE_API_URL || '/api');
 
 // Response interceptor for error handling
 apiClient.interceptors.response.use(
