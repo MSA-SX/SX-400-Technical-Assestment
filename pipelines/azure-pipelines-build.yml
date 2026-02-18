@@ -35,12 +35,12 @@ stages:
             displayName: 'Publish API'
             workingDirectory: '$(System.DefaultWorkingDirectory)'
 
-          - task: PublishPipelineArtifact@1
+          - task: PublishBuildArtifacts@1
             displayName: 'Publish backend artifact'
             inputs:
-              targetPath: '$(Build.ArtifactStagingDirectory)/backend'
-              artifact: 'backend-drop'
-              publishLocation: 'pipeline'
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)/backend'
+              ArtifactName: 'backend-drop'
+              publishLocation: 'Container'
 
   # ─────────────────────────────────────────────────────
   # Stage 2: Build Frontend (React + Vite)
@@ -75,9 +75,9 @@ stages:
               archiveType: 'zip'
               archiveFile: '$(Build.ArtifactStagingDirectory)/frontend/frontend.zip'
 
-          - task: PublishPipelineArtifact@1
+          - task: PublishBuildArtifacts@1
             displayName: 'Publish frontend artifact'
             inputs:
-              targetPath: '$(Build.ArtifactStagingDirectory)/frontend'
-              artifact: 'frontend-drop'
-              publishLocation: 'pipeline'
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)/frontend'
+              ArtifactName: 'frontend-drop'
+              publishLocation: 'Container'
