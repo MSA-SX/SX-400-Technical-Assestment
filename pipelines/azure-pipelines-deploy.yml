@@ -1,5 +1,5 @@
 
-trigger: none
+trigger: none #no triggers, depends on the build pipeline
 
 resources:
   pipelines:
@@ -11,12 +11,12 @@ resources:
             - main
 
 pool:
-  name: 'linux-latest'
+  name: 'pool'
 
 variables:
-  azureSubscription: 'Infra 04 - SX 400 Test'     
-  backendAppName: 'sx-400-be-wa'   
-  frontendAppName: 'sx400-fe-wa' 
+  azureSubscription: 'Your Service Connection'  #Service Connection to deploy resources in azure    
+  backendAppName: 'BE-AppService'   #Name of your backend appservice
+  frontendAppName: 'FE-AppService'   #Name of your frontend appservice
 
 stages:
   - stage: Deploy
@@ -30,7 +30,7 @@ stages:
           runOnce:
             deploy:
               steps:
-                - download: buildPipeline
+                - download: buildPipeline  #Using the BE drop created in the build stage
                   artifact: 'backend-drop'
                   displayName: 'Download backend artifact'
 
@@ -51,7 +51,7 @@ stages:
           runOnce:
             deploy:
               steps:
-                - download: buildPipeline
+                - download: buildPipeline  #Using the FE drop created in the build stage
                   artifact: 'frontend-drop'
                   displayName: 'Download frontend artifact'
 
