@@ -63,3 +63,4 @@ stages:
                     appName: $(frontendAppName)
                     package: '$(Pipeline.Workspace)/buildPipeline/frontend-drop'
                     runtimeStack: 'NODE|20-lts'
+                    startUpCommand: 'pm2 serve /home/site/wwwroot --no-daemon --spa'
