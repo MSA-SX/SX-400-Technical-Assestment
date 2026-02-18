@@ -72,8 +72,6 @@ stages:
           - script: npm run build
             displayName: 'Build production bundle'
             workingDirectory: 'frontend'
-            env:
-              VITE_API_URL: $(VITE_API_URL)   # Set in pipeline variables
 
           - task: ArchiveFiles@2
             displayName: 'Zip frontend dist'
