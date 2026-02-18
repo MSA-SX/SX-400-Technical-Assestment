@@ -31,9 +31,17 @@ stages:
             displayName: 'Build solution'
             workingDirectory: 'backend'
 
-          - script: dotnet publish backend/SX400.Api/SX400.Api.csproj --configuration Release --output $(Build.ArtifactStagingDirectory)/backend --no-build
+          - script: dotnet publish backend/SX400.Api/SX400.Api.csproj --configuration Release --output $(Build.ArtifactStagingDirectory)/backend-raw --no-build
             displayName: 'Publish API'
             workingDirectory: '$(System.DefaultWorkingDirectory)'
+
+          - task: ArchiveFiles@2
+            displayName: 'Zip backend publish output'
+            inputs:
+              rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/backend-raw'
+              includeRootFolder: false
+              archiveType: 'zip'
+              archiveFile: '$(Build.ArtifactStagingDirectory)/backend/backend.zip'
 
           - task: PublishBuildArtifacts@1
             displayName: 'Publish backend artifact'
