@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || '/api',
+    baseURL: import.meta.env.VITE_BACKEND_URL || '/api',
 
     headers: {
         'Content-Type': 'application/json',
@@ -9,7 +9,7 @@ const apiClient = axios.create({
     timeout: 10000,
 });
 
-console.log('API Client Base URL:', import.meta.env.VITE_API_URL || '/api');
+console.log('API Client Base URL:', import.meta.env.VITE_BACKEND_URL || '/api');
 
 // Response interceptor for error handling
 apiClient.interceptors.response.use(
