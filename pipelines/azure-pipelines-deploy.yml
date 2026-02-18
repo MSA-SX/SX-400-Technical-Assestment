@@ -1,10 +1,5 @@
-# =============================================================================
-# SX400 — Deploy Pipeline
-# Triggered after the build pipeline completes on main.
-# Downloads build artifacts and deploys FE + BE in parallel to Azure App Services.
-# =============================================================================
 
-trigger: none   # Only triggered by pipeline resource
+trigger: none
 
 resources:
   pipelines:
@@ -16,24 +11,18 @@ resources:
             - main
 
 pool:
-  vmImage: 'ubuntu-latest'
+  name: 'linux-latest'
 
-# ─────────────────────────────────────────────────────
-# Variables — configure these in the Azure DevOps UI
-# or in a variable group for secrets
-# ─────────────────────────────────────────────────────
 variables:
-  azureSubscription: '<YOUR_SERVICE_CONNECTION>'      # Azure service connection name
-  backendAppName: '<YOUR_BACKEND_APP_SERVICE_NAME>'   # e.g., sx400-api
-  frontendAppName: '<YOUR_FRONTEND_APP_SERVICE_NAME>' # e.g., sx400-frontend
+  azureSubscription: 'Infra 04 - SX 400 Test'     
+  backendAppName: 'sx-400-be-wa'   
+  frontendAppName: 'sx400-fe-wa' 
 
 stages:
   - stage: Deploy
-    displayName: '🚀 Deploy to Azure App Services'
+    displayName: 'Deploy to App Services'
     jobs:
-      # ─────────────────────────────────────────────
       # Job 1: Deploy Backend API
-      # ─────────────────────────────────────────────
       - deployment: DeployBackend
         displayName: 'Deploy Backend API'
         environment: 'production-backend'
@@ -54,9 +43,7 @@ stages:
                     package: '$(Pipeline.Workspace)/buildPipeline/backend-drop'
                     runtimeStack: 'DOTNETCORE|8.0'
 
-      # ─────────────────────────────────────────────
-      # Job 2: Deploy Frontend (parallel — no dependsOn)
-      # ─────────────────────────────────────────────
+      # Job 2: Deploy Frontend
       - deployment: DeployFrontend
         displayName: 'Deploy Frontend'
         environment: 'production-frontend'
