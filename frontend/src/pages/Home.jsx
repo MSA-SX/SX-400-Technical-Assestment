@@ -17,7 +17,11 @@ function Home() {
             setLoading(true);
             setError(null);
             const response = await apiClient.get('/weather');
-            setForecasts(response.data);
+            if (Array.isArray(response.data)) {
+                setForecasts(response.data);
+            } else {
+                throw new Error('Received invalid data format (likely HTML instead of JSON). Check VITE_API_URL.');
+            }
         } catch (err) {
             setError(
                 err.response?.status === 0
