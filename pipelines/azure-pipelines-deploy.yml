@@ -61,5 +61,5 @@ stages:
                     azureSubscription: $(azureSubscription)
                     appType: 'webAppLinux'
                     appName: $(frontendAppName)
-                    package: '$(Pipeline.Workspace)/buildPipeline/frontend-drop/frontend.zip'
+                    package: '$(Pipeline.Workspace)/buildPipeline/frontend-drop'
                     runtimeStack: 'NODE|20-lts'
