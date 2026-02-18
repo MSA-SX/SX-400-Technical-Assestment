@@ -12,7 +12,7 @@ stages:
   # Stage 1: Build Backend (.NET 8)
   # ─────────────────────────────────────────────────────
   - stage: BuildBackend
-    displayName: '🔧 Build Backend'
+    displayName: 'Build Backend'
     jobs:
       - job: BuildDotNet
         displayName: 'Build & Test .NET API'
@@ -54,7 +54,7 @@ stages:
   # Stage 2: Build Frontend (React + Vite)
   # ─────────────────────────────────────────────────────
   - stage: BuildFrontend
-    displayName: '🎨 Build Frontend'
+    displayName: 'Build Frontend'
     dependsOn: []       # ← Run in parallel with backend
     jobs:
       - job: BuildReact

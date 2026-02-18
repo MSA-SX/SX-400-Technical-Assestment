@@ -59,4 +59,12 @@ app.UseCors("AllowFrontend");
 app.UseAuthorization();
 app.MapControllers();
 
+
+// Ensure the database is created and migrated
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    dbContext.Database.Migrate();
+}
+
 app.Run();
