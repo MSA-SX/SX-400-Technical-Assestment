@@ -67,9 +67,17 @@ stages:
             env:
               VITE_API_URL: $(VITE_API_URL)   # Set in pipeline variables
 
+          - task: ArchiveFiles@2
+            displayName: 'Zip frontend dist'
+            inputs:
+              rootFolderOrFile: 'frontend/dist'
+              includeRootFolder: false
+              archiveType: 'zip'
+              archiveFile: '$(Build.ArtifactStagingDirectory)/frontend/frontend.zip'
+
           - task: PublishPipelineArtifact@1
             displayName: 'Publish frontend artifact'
             inputs:
-              targetPath: 'frontend/dist'
+              targetPath: '$(Build.ArtifactStagingDirectory)/frontend'
               artifact: 'frontend-drop'
               publishLocation: 'pipeline'
